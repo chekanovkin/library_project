@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>E-library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <link href="../static/profile.css" th:href="@{/profile.css}" rel="stylesheet" />
+    <link href="../static/input.css" th:href="@{/input.css}" rel="stylesheet" />
+</head>
+<body>
+
+<div th:insert="~{navbar :: navbar}"></div>
+
+<div class="container">
+    <form method="post" enctype="multipart/form-data" th:action="@{/user/profile}">
+    <div class="main-body">
+        <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            <span th:if="${filename}">
+                                <img th:src="@{'/img/'+${filename}}" alt="Admin" class="rounded-circle" width="150" height="150"/>
+                            </span>
+                            <div class="mt-3">
+                                <h4>
+                                    <span th:text="${surname}"></span> <span th:text="${name}"></span>
+                                </h4>
+                                <p class="text-secondary mb-1">
+                                    <input name="position" class="border-line" th:placeholder="${position}"/>
+                                </p>
+                                <p class="text-muted font-size-sm">
+                                    <input name="department" class="border-line" th:placeholder="${department}"/>
+                                </p>
+                                <label for="file-upload" class="custom-file-upload">
+                                    <i class="fa fa-cloud-upload"></i> Загрузить фото
+                                </label>
+                                <p>
+
+                                </p>
+                                <input id="file-upload" type="file" name="file" hidden/>
+                                <p>
+                                    <button type="submit" class="btn btn-primary">Обновить</button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">ФИО</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <span th:text="${surname}"></span> <span th:text="${name}"></span> <span th:text=" ${patronymic}"></span>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Email</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <span th:text="${email}"></span>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+                <div class="row gutters-sm">
+                    <div class="col-sm-9 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Книги</i></h6>
+                                <div>
+                                    <small><a class="s8" href="/some/href">Программный комплекс многофакторного подбора литературных произведений</a></small>
+                                </div>
+                                <div>
+                                    <small><a class="s8" href="/some/href">Программный комплекс для навигации внутри зданий и комплексов зданий со сложной внутренней организацией</a></small>
+                                </div>
+                                <div>
+                                    <small><a class="s8" href="/some/href">Система, прогнозирующая исход киберспортивных мероприятий</a></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" th:value="${user.id}" name="userID">
+    </form>
+    </div>
+</body>
+</html>
