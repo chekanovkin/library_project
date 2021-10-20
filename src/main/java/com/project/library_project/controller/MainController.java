@@ -25,7 +25,6 @@ public class MainController {
         return "login";
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @GetMapping("/")
     public String main() {
         return "main";
@@ -59,6 +58,6 @@ public class MainController {
         }
 
         userService.save(user);
-        return "redirect:/user/profile";
+        return "redirect:/login";
     }
 }
