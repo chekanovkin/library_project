@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -36,6 +37,9 @@ public class User implements UserDetails {
     @Email
     @NotEmpty
     String email;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
+    private Set<LibraryCard> libraryCards = new HashSet<>();
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))

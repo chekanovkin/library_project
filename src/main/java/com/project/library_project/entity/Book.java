@@ -24,6 +24,8 @@ public class Book {
     @NotEmpty
     int year;
 
+    String filename;
+
     String description;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -37,4 +39,7 @@ public class Book {
         inverseJoinColumns = {@JoinColumn(name = "genre_id")}
     )
     private Set<Genre> genres = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
+    private Set<LibraryCard> libraryCards = new HashSet<>();
 }

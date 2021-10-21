@@ -3,6 +3,7 @@ package com.project.library_project.controller;
 import com.project.library_project.entity.User;
 import com.project.library_project.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,7 +17,8 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping("profile")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    @GetMapping("/profile")
     public String getProfile(Model model, @AuthenticationPrincipal User user) {
 
         model.addAttribute("password", user.getPassword());
@@ -24,6 +26,7 @@ public class UserController {
         model.addAttribute("surname", user.getSurname());
         model.addAttribute("patronymic", user.getPatronymic());
         model.addAttribute("email", user.getEmail());
+        model.addAttribute("cards", user.getLibraryCards());
         model.addAttribute("user", user);
 
         return "profile";

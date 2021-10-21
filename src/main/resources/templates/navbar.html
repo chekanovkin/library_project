@@ -22,10 +22,10 @@
                 <a class="nav-link" href="/user/profile" sec:authorize="isAuthenticated()">Личный кабинет</a>
             </li>
             <li class="nav-item" >
-                <a class="nav-link" href="/user/projectList" sec:authorize="isAuthenticated()">Каталог книг</a>
+                <a class="nav-link" href="/books/list" sec:authorize="isAuthenticated()">Каталог книг</a>
             </li>
             <li class="nav-item" >
-                <a class="nav-link" href="/user/workerList" sec:authorize="hasAuthority('ADMIN')">Пользователи</a>
+                <a class="nav-link" href="/admin/userList" sec:authorize="hasAuthority('ADMIN')">Пользователи</a>
             </li>
             <li class="nav-item" >
                 <a class="nav-link" href="/registration" sec:authorize="hasAuthority('ADMIN')">Регистрация библиотекаря</a>
@@ -34,7 +34,7 @@
         <div class="d-flex flex-row-reverse">
             <div class="navbar-text p-2" sec:authentication="name"></div>
         </div>
-        <form th:action="@{/logout}" method="post" class="d-flex">
+        <form th:action="@{/logout}" method="post" class="d-flex" sec:authorize="isAuthenticated()">
             <button class="btn btn-outline-success" type="submit">Выйти</button>
         </form>
     </div>

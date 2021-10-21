@@ -1,0 +1,24 @@
+cloud:
+  aws:
+    credentials:
+      access-key: AKIA3XPJ6NTM6Q5DU6MY
+      secret-key: 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
+    region:
+      static: eu-north-1
+    stack:
+      auto: false
+
+application:
+  bucket:
+    name: kainen-bucket
+
+
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 200MB
+      max-request-size: 200MB
+
+server:
+  port: 8080

@@ -4,7 +4,6 @@ import com.project.library_project.entity.User;
 import com.project.library_project.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,7 +20,7 @@ public class MainController {
     UserService userService;
 
     @GetMapping("/login")
-    public String login(){
+    public String login() {
         return "login";
     }
 
@@ -60,4 +59,6 @@ public class MainController {
         userService.save(user);
         return "redirect:/login";
     }
+
+
 }
