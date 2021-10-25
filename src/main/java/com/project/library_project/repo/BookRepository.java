@@ -1,14 +1,17 @@
 package com.project.library_project.repo;
 
+import com.project.library_project.entity.Author;
 import com.project.library_project.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    Book findByName(String name);
+    Book findByNameAndAuthor(String name, Author author);
 
     List<Book> findByYear(int year);
 

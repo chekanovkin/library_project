@@ -20,6 +20,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @NotEmpty
     @Column(unique = true)
     private String login;
 
@@ -27,16 +28,19 @@ public class User implements UserDetails {
     private String password;
 
     @NotEmpty
-    String name;
+    private String name;
 
     @NotEmpty
-    String surname;
+    private String surname;
 
-    String patronymic;
+    private String patronymic;
 
     @Email
     @NotEmpty
-    String email;
+    private String email;
+
+    @NotEmpty
+    private int reservedBooks;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
     private Set<LibraryCard> libraryCards = new HashSet<>();

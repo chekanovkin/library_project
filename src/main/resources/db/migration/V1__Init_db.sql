@@ -2,19 +2,20 @@ create sequence hibernate_sequence start 1 increment 1;
 
 create table author (
     id int8 not null, 
-    name varchar(255), 
-    patronymic varchar(255), 
-    surname varchar(255), 
+    name varchar(50),
+    patronymic varchar(50),
+    surname varchar(50),
     primary key (id)
 );
 
 create table book (
     id int8 not null, 
     amount int4 not null, 
-    description varchar(255), 
-    name varchar(255), 
+    description varchar(400),
+    name varchar(100),
     year int4 not null, 
-    author_id int8, 
+    author_id int8,
+    filename varchar(100),
     primary key (id)
 );
 
@@ -26,14 +27,14 @@ create table book_genre (
 
 create table genre (
     id int8 not null, 
-    name varchar(255), 
+    name varchar(50),
     primary key (id)
 );
 
 create table library_card (
     id int8 not null, 
-    delivery_date timestamp, 
-    receiving_date timestamp, 
+    delivery_date date,
+    receiving_date date,
     book_id int8, 
     user_id int8, 
     primary key (id)
@@ -41,17 +42,18 @@ create table library_card (
 
 create table user_role (
     user_id int8 not null, 
-    roles varchar(255)
+    roles varchar(15)
 );
 
 create table usr (
     id int8 not null,
-    email varchar(255),
-    login varchar(255),
-    name varchar(255),
+    email varchar(70),
+    login varchar(40),
+    name varchar(50),
     password varchar(255),
-    patronymic varchar(255),
-    surname varchar(255),
+    patronymic varchar(50),
+    surname varchar(50),
+    reserved_books int4 not null,
     primary key (id)
 );
 

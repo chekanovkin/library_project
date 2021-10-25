@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Objects;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -21,9 +22,6 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     UserRepository userRepo;
-
-    public UserService() {
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -36,14 +34,23 @@ public class UserService implements UserDetailsService {
 
     public boolean save(User user) {
         User userFromDb = userRepo.findByLogin(user.getUsername());
-        if (userFromDb != null) {
+        if (Objects.nonNull(userFromDb)) {
             return false;
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Collections.singleton(Role.USER));
+        user.setReservedBooks(0);
         userRepo.save(user);
+        return true;
+    }
 
+    public boolean update(User user) {
+        User userFromDb = userRepo.findByLogin(user.getUsername());
+        if (Objects.isNull(userFromDb)) {
+            return false;
+        }
+        userRepo.save(user);
         return true;
     }
 }

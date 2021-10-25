@@ -17,7 +17,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/profile")
     public String getProfile(Model model, @AuthenticationPrincipal User user) {
 

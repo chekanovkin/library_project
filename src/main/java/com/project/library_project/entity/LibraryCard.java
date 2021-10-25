@@ -3,7 +3,7 @@ package com.project.library_project.entity;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @Entity
@@ -21,7 +21,7 @@ public class LibraryCard {
     @JoinColumn(name = "book_id")
     private Book book;
 
-    private Date receivingDate;
+    private LocalDate receivingDate;
 
-    private Date deliveryDate;
+    private LocalDate deliveryDate;
 }
