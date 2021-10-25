@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
@@ -54,15 +53,14 @@ public class BookController {
         @RequestParam(value = "name") String name,
         @RequestParam(value = "amount") Integer amount,
         @RequestParam(value = "year") Integer year,
-        @RequestParam(value = "author") Long authorId,
-        @RequestBody Set<Genre> genres) {
+        @RequestParam(value = "author") Long authorId) {
+        storageService.uploadMultipartFile(file);
         ObjectMapper mapper = new ObjectMapper();
         Book book = new Book();
         book.setName(name);
         book.setAmount(amount);
         book.setYear(year);
         book.setAuthor(authorService.findById(authorId));
-        book.setGenres(genres);
         book.setFilename(file.getOriginalFilename());
         bookService.save(book);
         try {

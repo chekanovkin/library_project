@@ -1,5 +1,6 @@
 package com.project.library_project.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -30,6 +31,7 @@ public class Book {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id")
+    @JsonBackReference
     private Author author;
 
     @ManyToMany(fetch = FetchType.EAGER)
