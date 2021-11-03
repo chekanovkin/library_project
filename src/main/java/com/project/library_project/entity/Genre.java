@@ -1,6 +1,10 @@
 package com.project.library_project.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -9,6 +13,7 @@ import java.util.Set;
 
 @Data
 @Entity
+@EqualsAndHashCode(exclude = "books")
 public class Genre {
 
     @Id
@@ -24,5 +29,6 @@ public class Genre {
         joinColumns = {@JoinColumn(name = "genre_id")},
         inverseJoinColumns = {@JoinColumn(name = "book_id")}
     )
+    @JsonIgnore
     private Set<Book> books = new HashSet<>();
 }

@@ -1,10 +1,8 @@
 package com.project.library_project.controller;
 
-import com.amazonaws.services.dynamodbv2.xspec.B;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.library_project.entity.Book;
-import com.project.library_project.entity.Genre;
 import com.project.library_project.entity.LibraryCard;
 import com.project.library_project.entity.User;
 import com.project.library_project.service.*;
@@ -24,9 +22,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
 
 @Controller
-@PreAuthorize("isAuthenticated()")
+//@PreAuthorize("isAuthenticated()")
 @RequestMapping("/books")
 public class BookController {
 
@@ -47,23 +47,27 @@ public class BookController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @PreAuthorize("hasAuthority('LIBRARIAN')")
+    //@PreAuthorize("hasAuthority('LIBRARIAN')")
     @PostMapping("/add")
-    public ResponseEntity<String> uploadBook(@RequestParam(value = "book") MultipartFile file,
-        @RequestParam(value = "name") String name,
-        @RequestParam(value = "amount") Integer amount,
-        @RequestParam(value = "year") Integer year,
-        @RequestParam(value = "author") Long authorId) {
+    public ResponseEntity<String> addBook(@RequestParam(value = "book") MultipartFile file,
+                                             @RequestParam() String name,
+                                             @RequestParam() Integer amount,
+                                             @RequestParam() Integer year,
+                                             @RequestParam(required = false) String description,
+                                             @RequestParam(value = "author") Long authorId) {
         storageService.uploadMultipartFile(file);
         ObjectMapper mapper = new ObjectMapper();
         Book book = new Book();
         book.setName(name);
         book.setAmount(amount);
         book.setYear(year);
+        if (StringUtils.isNotEmpty(description)) {
+            book.setDescription(description);
+        }
         book.setAuthor(authorService.findById(authorId));
         book.setFilename(file.getOriginalFilename());
-        bookService.save(book);
         try {
+            bookService.save(book);
             return new ResponseEntity<>(mapper.writeValueAsString(book), HttpStatus.OK);
         } catch (JsonProcessingException e) {
             logger.error(e.getMessage());
@@ -84,9 +88,12 @@ public class BookController {
     }
 
     @PreAuthorize("hasAuthority('LIBRARIAN')")
-    @DeleteMapping("/delete/{filename}")
-    public ResponseEntity<String> deleteBook(@PathVariable String filename) {
-        return new ResponseEntity<>(storageService.deleteFile(filename), HttpStatus.OK);
+    @GetMapping("/delete/{id}")
+    public ResponseEntity<String> deleteBook(@PathVariable Long id) {
+        Book bookToDelete = bookService.findById(id);
+        bookService.delete(bookToDelete);
+        storageService.deleteFile(bookToDelete.getFilename());
+        return new ResponseEntity<>("Книга \"" + bookToDelete.getName() + "\" была удалена", HttpStatus.OK);
     }
 
     @GetMapping("/list")
@@ -100,19 +107,49 @@ public class BookController {
         return new ResponseEntity<>(StringUtils.EMPTY, HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/list/byGenre")
-    public ResponseEntity<String> getBooksByGenre(String genre) {
+    @PostMapping("/byGenre")
+    public ResponseEntity<String> getBooksByGenre(@RequestParam String genre) {
         ObjectMapper mapper = new ObjectMapper();
+        List<Book> bookList = bookService.getAllByGenre(genre);
         try {
-            return new ResponseEntity<>(mapper.writeValueAsString(bookService.getAllByGenre(genre)), HttpStatus.OK);
+            return new ResponseEntity<>(mapper.writeValueAsString(bookList), HttpStatus.OK);
         } catch (JsonProcessingException e) {
             logger.error(e.getMessage());
         }
         return new ResponseEntity<>(StringUtils.EMPTY, HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/reserve")
-    public ResponseEntity<String> reserveBook(@AuthenticationPrincipal User user, @RequestParam Long id) {
+    @PostMapping("/update/{id}")
+    public ResponseEntity<String> updateBook(@PathVariable Long id,
+                                             @RequestParam(value = "book", required = false) MultipartFile file,
+                                             @RequestParam(required = false) String name,
+                                             @RequestParam(required = false) String description,
+                                             @RequestParam(required = false) Integer amount) {
+        ObjectMapper mapper = new ObjectMapper();
+        Book bookToUpdate = bookService.findById(id);
+        if (StringUtils.isNotEmpty(name)) {
+            bookToUpdate.setName(name);
+        }
+        if (StringUtils.isNotEmpty(description)) {
+            bookToUpdate.setDescription(description);
+        }
+        if (Objects.nonNull(file)) {
+            bookToUpdate.setFilename(file.getOriginalFilename());
+        }
+        if (Objects.nonNull(amount)) {
+            bookToUpdate.setName(name);
+        }
+        try {
+            bookService.update(bookToUpdate);
+            return new ResponseEntity<>(mapper.writeValueAsString(bookToUpdate), HttpStatus.OK);
+        } catch (JsonProcessingException e) {
+            logger.error(e.getMessage());
+        }
+        return new ResponseEntity<>("Не удалось обновить книгу", HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/reserve/{id}")
+    public ResponseEntity<String> reserveBook(@AuthenticationPrincipal User user, @PathVariable Long id) {
         Book reservedBook = bookService.findById(id);
         if (user.getReservedBooks() == 5) {
             return new ResponseEntity<>("Невозможно забронировать более 5 книг", HttpStatus.BAD_REQUEST);

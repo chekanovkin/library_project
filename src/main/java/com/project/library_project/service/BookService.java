@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class BookService {
@@ -25,7 +26,8 @@ public class BookService {
     }
 
     public Book findById(Long id) {
-        return bookRepository.getById(id);
+        Optional<Book> book = bookRepository.findById(id);
+        return book.orElseGet(Book::new);
     }
 
     public boolean save(Book book) {
@@ -43,6 +45,15 @@ public class BookService {
             return false;
         }
         bookRepository.save(book);
+        return true;
+    }
+
+    public boolean delete(Book book) {
+        Book bookFromDb = bookRepository.findByNameAndAuthor(book.getName(), book.getAuthor());
+        if (Objects.isNull(bookFromDb)) {
+            return false;
+        }
+        bookRepository.delete(book);
         return true;
     }
 }
