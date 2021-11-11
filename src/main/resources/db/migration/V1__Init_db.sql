@@ -69,7 +69,7 @@ alter table if exists book_author
 add constraint FK52evq6pdc5ypanf41bij5u219 foreign key (book_id) references book;
 
 alter table if exists book_author
-add constraint FK52evq6pdc5ypanf41bij5u220 foreign key (author_id) references book;
+add constraint FK52evq6pdc5ypanf41bij5u220 foreign key (author_id) references author;
 
 alter table if exists book_genre 
 add constraint FK52evq6pdc5ypanf41bij5u218 foreign key (book_id) references book;
