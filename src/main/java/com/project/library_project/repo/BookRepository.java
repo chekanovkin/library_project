@@ -7,12 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    Book findByNameAndAuthor(String name, Author author);
+    Book findByNameAndAuthorsIn(String name, Set<Author> authors);
 
     List<Book> findByYear(int year);
 
@@ -20,4 +20,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
         "join b.genres g " +
         "where lower(concat(g.name)) like lower(concat('%', :genre, '%'))")
     List<Book> findBooksByGenre(String genre);
+
+    List<Book> findBooksByAuthors_Name(String authorName);
 }

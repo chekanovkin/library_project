@@ -1,7 +1,6 @@
 package com.project.library_project.service;
 
 import com.project.library_project.entity.Author;
-import com.project.library_project.entity.Book;
 import com.project.library_project.exception.AuthorNotFoundException;
 import com.project.library_project.repo.AuthorRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class AuthorService {
@@ -19,6 +19,10 @@ public class AuthorService {
 
     public Author findById(Long id) {
         return authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundException(id));
+    }
+
+    public Set<Author> findByIdIn(Set<Long> ids) {
+        return authorRepository.findByIdIn(ids);
     }
 
     public Author save(String name, String surname, String patronymic) {

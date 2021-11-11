@@ -1,9 +1,8 @@
 package com.project.library_project.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -13,7 +12,6 @@ import java.util.Set;
 @Data
 @Entity
 @EqualsAndHashCode(exclude = "books")
-//@ToString(exclude = "books")
 public class Author {
 
     @Id
@@ -29,7 +27,12 @@ public class Author {
     @NotEmpty
     String patronymic;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")
-    @JsonManagedReference
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "book_author",
+        joinColumns = {@JoinColumn(name = "author_id")},
+        inverseJoinColumns = {@JoinColumn(name = "book_id")}
+    )
+    @JsonIgnore
     private Set<Book> books = new HashSet<>();
 }

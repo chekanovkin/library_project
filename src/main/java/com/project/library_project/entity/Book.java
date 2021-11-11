@@ -1,6 +1,5 @@
 package com.project.library_project.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,10 +30,13 @@ public class Book {
 
     String description;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "author_id")
-    @JsonBackReference
-    private Author author;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "book_author",
+        joinColumns = {@JoinColumn(name = "book_id")},
+        inverseJoinColumns = {@JoinColumn(name = "author_id")}
+    )
+    private Set<Author> authors;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

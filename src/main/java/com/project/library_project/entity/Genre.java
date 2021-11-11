@@ -1,8 +1,6 @@
 package com.project.library_project.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,7 +21,7 @@ public class Genre {
     @NotEmpty
     String name;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "book_genre",
         joinColumns = {@JoinColumn(name = "genre_id")},

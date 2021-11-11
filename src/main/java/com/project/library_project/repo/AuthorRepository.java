@@ -11,5 +11,7 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
 
     Set<Author> findBySurname(String surname);
 
+    Set<Author> findByIdIn(Set<Long> ids);
+
     Author findByNameAndSurname(String name, String surname);
 }

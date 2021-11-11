@@ -34,12 +34,16 @@ public class BookService {
         return bookRepository.findBooksByGenre(genre);
     }
 
+    public List<Book> getAllByAuthor(String author) {
+        return bookRepository.findBooksByAuthors_Name(author);
+    }
+
     public Book findById(Long id) {
         return bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
     }
 
-    public Book save(String name, Integer amount, Integer year, String description, Long authorId, List<String> genreNames) {
-        Book bookFromDb = bookRepository.findByNameAndAuthor(name, authorService.findById(authorId));
+    public Book save(String name, Integer amount, Integer year, String description, Set<Long> authorIds, List<String> genreNames) {
+        Book bookFromDb = bookRepository.findByNameAndAuthorsIn(name, authorService.findByIdIn(authorIds));
         if (Objects.nonNull(bookFromDb)) {
             return bookFromDb;
         }
@@ -50,7 +54,7 @@ public class BookService {
         if (StringUtils.isNotEmpty(description)) {
             book.setDescription(description);
         }
-        book.setAuthor(authorService.findById(authorId));
+        book.setAuthors(authorService.findByIdIn(authorIds));
         Set<Genre> genres = new HashSet<>();
         for (String str : genreNames) {
             Genre genre = genreService.findByName(str);
@@ -58,7 +62,7 @@ public class BookService {
         }
         book.setGenres(genres);
         bookRepository.save(book);
-        return bookRepository.findByNameAndAuthor(book.getName(), book.getAuthor());
+        return bookRepository.findByNameAndAuthorsIn(book.getName(), book.getAuthors());
     }
 
     public Book update(Long id, MultipartFile file, String name, String description, Integer amount) {

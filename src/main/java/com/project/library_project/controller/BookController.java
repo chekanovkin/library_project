@@ -3,7 +3,6 @@ package com.project.library_project.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.library_project.entity.Book;
-import com.project.library_project.entity.User;
 import com.project.library_project.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 @Controller
 //@PreAuthorize("isAuthenticated()")
@@ -29,19 +29,13 @@ public class BookController {
     @Autowired
     BookService bookService;
 
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    LibraryCardService libraryCardService;
-
     //@PreAuthorize("hasAuthority('LIBRARIAN')")
     @PostMapping("/book")
     public ResponseEntity<String> addBook(@RequestParam() String name,
                                           @RequestParam() Integer amount,
                                           @RequestParam() Integer year,
                                           @RequestParam(required = false) String description,
-                                          @RequestParam(value = "author") Long authorId,
+                                          @RequestParam(value = "author") Set<Long> authorId,
                                           @RequestParam List<String> genres) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Book book = bookService.save(name, amount, year, description, authorId, genres);
@@ -76,6 +70,13 @@ public class BookController {
     public ResponseEntity<String> getBooksByGenre(@RequestParam String genre) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         List<Book> bookList = bookService.getAllByGenre(genre);
+        return new ResponseEntity<>(mapper.writeValueAsString(bookList), HttpStatus.OK);
+    }
+
+    @GetMapping("/books/by-author")
+    public ResponseEntity<String> getBooksByAuthor(@RequestParam String author) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        List<Book> bookList = bookService.getAllByAuthor(author);
         return new ResponseEntity<>(mapper.writeValueAsString(bookList), HttpStatus.OK);
     }
 

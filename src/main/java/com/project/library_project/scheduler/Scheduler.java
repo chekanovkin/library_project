@@ -5,7 +5,6 @@ import com.project.library_project.entity.LibraryCard;
 import com.project.library_project.entity.User;
 import com.project.library_project.repo.LibraryCardRepository;
 import com.project.library_project.service.BookService;
-import com.project.library_project.service.LibraryCardService;
 import com.project.library_project.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

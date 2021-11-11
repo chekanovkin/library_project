@@ -13,8 +13,7 @@ create table book (
     amount int4 not null, 
     description varchar(400),
     name varchar(100),
-    year int4 not null, 
-    author_id int8,
+    year int4 not null,
     filename varchar(100),
     primary key (id)
 );
@@ -23,6 +22,12 @@ create table book_genre (
     genre_id int8 not null, 
     book_id int8 not null, 
     primary key (book_id, genre_id)
+);
+
+create table book_author (
+    author_id int8 not null,
+    book_id int8 not null,
+    primary key (book_id, author_id)
 );
 
 create table genre (
@@ -60,8 +65,11 @@ create table usr (
 alter table if exists usr 
 add constraint UK_b2j2bjirhqhbg1rsexaq5qs9x unique (login);
 
-alter table if exists book 
-add constraint FKklnrv3weler2ftkweewlky958 foreign key (author_id) references author;
+alter table if exists book_author
+add constraint FK52evq6pdc5ypanf41bij5u219 foreign key (book_id) references book;
+
+alter table if exists book_author
+add constraint FK52evq6pdc5ypanf41bij5u220 foreign key (author_id) references book;
 
 alter table if exists book_genre 
 add constraint FK52evq6pdc5ypanf41bij5u218 foreign key (book_id) references book;
