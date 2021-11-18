@@ -1,8 +1,10 @@
 package com.project.library_project.scheduler;
 
 import com.project.library_project.entity.Book;
+import com.project.library_project.entity.BookStorage;
 import com.project.library_project.entity.LibraryCard;
 import com.project.library_project.entity.User;
+import com.project.library_project.repo.BookStorageRepository;
 import com.project.library_project.repo.LibraryCardRepository;
 import com.project.library_project.service.BookService;
 import com.project.library_project.service.UserService;
@@ -23,7 +25,7 @@ public class Scheduler {
     UserService userService;
 
     @Autowired
-    BookService bookService;
+    BookStorageRepository bookStorageRepository;
 
     @Autowired
     LibraryCardRepository libraryCardRepository;
@@ -42,8 +44,9 @@ public class Scheduler {
         }
         List<Book> books = cards.stream().map(LibraryCard::getBook).collect(Collectors.toList());
         for (Book book : books) {
-            book.setAmount(book.getAmount() + 1);
-            bookService.update(book);
+            BookStorage bookStorage = bookStorageRepository.getById(book.getId());
+            bookStorage.setAmount(bookStorage.getAmount() + 1);
+            bookStorageRepository.save(bookStorage);
         }
     }
 }

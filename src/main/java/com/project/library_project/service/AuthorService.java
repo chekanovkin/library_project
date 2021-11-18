@@ -4,8 +4,12 @@ import com.project.library_project.entity.Author;
 import com.project.library_project.exception.AuthorNotFoundException;
 import com.project.library_project.repo.AuthorRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.ObjectNotFoundException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -24,7 +28,7 @@ public class AuthorService {
     public Set<Author> findByIdIn(Set<Long> ids) {
         return authorRepository.findByIdIn(ids);
     }
-
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
     public Author save(String name, String surname, String patronymic) {
         Author authorFromDb = authorRepository.findByNameAndSurname(name, surname);
         if (Objects.nonNull(authorFromDb)) {
@@ -36,10 +40,10 @@ public class AuthorService {
         if (StringUtils.isNotEmpty(patronymic)) {
             author.setPatronymic(patronymic);
         }
-        authorRepository.save(author);
-        return authorRepository.findByNameAndSurname(name, surname);
+        return authorRepository.save(author);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
     public boolean delete(Long id) {
         Optional<Author> authorFromDb = authorRepository.findById(id);
         if (authorFromDb.isEmpty()) {

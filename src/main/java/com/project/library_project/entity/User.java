@@ -42,7 +42,7 @@ public class User implements UserDetails {
     @NotEmpty
     private int reservedBooks;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner", cascade = CascadeType.ALL)
     private Set<LibraryCard> libraryCards = new HashSet<>();
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)

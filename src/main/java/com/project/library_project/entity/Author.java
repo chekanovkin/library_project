@@ -27,7 +27,7 @@ public class Author {
     @NotEmpty
     String patronymic;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "book_author",
         joinColumns = {@JoinColumn(name = "author_id")},

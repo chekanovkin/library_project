@@ -21,16 +21,17 @@ public class Book {
     String name;
 
     @NotEmpty
-    int amount;
-
-    @NotEmpty
     int year;
 
     String filename;
 
     String description;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private BookStorage bookStorage;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "book_author",
         joinColumns = {@JoinColumn(name = "book_id")},
@@ -38,7 +39,7 @@ public class Book {
     )
     private Set<Author> authors;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "book_genre",
         joinColumns = {@JoinColumn(name = "book_id")},
@@ -46,7 +47,7 @@ public class Book {
     )
     private Set<Genre> genres = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "book", cascade = CascadeType.ALL)
     private Set<LibraryCard> libraryCards = new HashSet<>();
 
 

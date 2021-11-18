@@ -84,10 +84,9 @@ public class BookController {
     public ResponseEntity<String> updateBook(@PathVariable Long id,
                                              @RequestParam(value = "book", required = false) MultipartFile file,
                                              @RequestParam(required = false) String name,
-                                             @RequestParam(required = false) String description,
-                                             @RequestParam(required = false) Integer amount) throws JsonProcessingException {
+                                             @RequestParam(required = false) String description) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        Book bookToUpdate = bookService.update(id, file, name, description, amount);
+        Book bookToUpdate = bookService.update(id, file, name, description);
         return new ResponseEntity<>(mapper.writeValueAsString(bookToUpdate), HttpStatus.OK);
     }
 }

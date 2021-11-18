@@ -1,7 +1,9 @@
 package com.project.library_project.controller;
 
 import com.project.library_project.entity.Book;
+import com.project.library_project.entity.BookStorage;
 import com.project.library_project.entity.User;
+import com.project.library_project.repo.BookStorageRepository;
 import com.project.library_project.service.BookService;
 import com.project.library_project.service.LibraryCardService;
 import com.project.library_project.service.UserService;
@@ -25,19 +27,23 @@ public class LibraryCardController {
     BookService bookService;
 
     @Autowired
+    BookStorageRepository bookStorageRepository;
+
+    @Autowired
     UserService userService;
 
     @PostMapping("/library-card")
     public ResponseEntity<String> reserveBook(@AuthenticationPrincipal User user, @RequestParam Long bookId) {
         Book reservedBook = bookService.findById(bookId);
+        BookStorage bookStorage = bookStorageRepository.getById(reservedBook.getId());
         if (user.getReservedBooks() == 5) {
             return new ResponseEntity<>("Невозможно забронировать более 5 книг", HttpStatus.BAD_REQUEST);
-        } else if (reservedBook.getAmount() == 0) {
+        } else if (bookStorage.getAmount() == 0) {
             return new ResponseEntity<>("Экземпляры книги в библиотеке кончились", HttpStatus.BAD_REQUEST);
         } else {
             libraryCardService.save(user, reservedBook);
-            reservedBook.setAmount(reservedBook.getAmount() - 1);
-            bookService.update(reservedBook);
+            bookStorage.setAmount(bookStorage.getAmount() - 1);
+            bookStorageRepository.save(bookStorage);
             user.setReservedBooks(user.getReservedBooks() + 1);
             userService.update(user);
             return new ResponseEntity<>("Пользователь " + user.getLogin() + " забронировал книгу \"" + reservedBook.getName() + "\"", HttpStatus.OK);

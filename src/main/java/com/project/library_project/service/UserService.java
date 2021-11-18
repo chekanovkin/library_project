@@ -3,12 +3,16 @@ package com.project.library_project.service;
 import com.project.library_project.entity.Role;
 import com.project.library_project.entity.User;
 import com.project.library_project.repo.UserRepository;
+import org.hibernate.ObjectNotFoundException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -32,6 +36,7 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
     public boolean save(User user) {
         User userFromDb = userRepo.findByLogin(user.getUsername());
         if (Objects.nonNull(userFromDb)) {
@@ -45,6 +50,7 @@ public class UserService implements UserDetailsService {
         return true;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
     public boolean update(User user) {
         User userFromDb = userRepo.findByLogin(user.getUsername());
         if (Objects.isNull(userFromDb)) {

@@ -21,7 +21,7 @@ public class Genre {
     @NotEmpty
     String name;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "book_genre",
         joinColumns = {@JoinColumn(name = "genre_id")},
