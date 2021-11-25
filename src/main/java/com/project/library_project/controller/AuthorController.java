@@ -4,13 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.library_project.entity.Author;
 import com.project.library_project.service.AuthorService;
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.AbstractMap;
 import java.util.logging.Logger;
 
 @Controller
@@ -27,7 +27,7 @@ public class AuthorController {
                                             @RequestParam String surname,
                                             @RequestParam(required = false) String patronymic) throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
-        Pair<String, Author> answer = authorService.save(name, surname, patronymic);
+        AbstractMap.SimpleEntry<String, Author> answer = authorService.save(name, surname, patronymic);
         if (answer.getKey().equals("Exists")) {
             log.info("Попытка создать существующего автора " + "[" + answer.getValue().getId() + ", " + answer.getValue().getSurname() + answer.getValue().getName() + answer.getValue().getPatronymic() + "]");
             return new ResponseEntity<>("Автор уже существует\n" + mapper.writeValueAsString(answer.getValue()), HttpStatus.OK);

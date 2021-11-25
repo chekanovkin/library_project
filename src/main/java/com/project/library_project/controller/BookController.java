@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.library_project.entity.Book;
 import com.project.library_project.service.*;
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -42,7 +42,7 @@ public class BookController {
                                           @RequestParam(value = "author") Set<Long> authorId,
                                           @RequestParam Set<String> genres) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        Pair<String, Book> answer = bookService.save(name, amount, year, description, authorId, genres);
+        AbstractMap.SimpleEntry<String, Book> answer = bookService.save(name, amount, year, description, authorId, genres);
         if (answer.getKey().equals("Exists")) {
             log.info("Попытка создать существующую книгу " + "[" + answer.getValue().getId() + ", " + answer.getValue().getName() + "]");
             return new ResponseEntity<>("Книга уже существует\n" + mapper.writeValueAsString(answer.getValue()), HttpStatus.OK);

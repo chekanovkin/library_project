@@ -3,7 +3,6 @@ package com.project.library_project.service;
 import com.project.library_project.entity.Author;
 import com.project.library_project.exception.AuthorNotFoundException;
 import com.project.library_project.repo.AuthorRepository;
-import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.exception.ConstraintViolationException;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.AbstractMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -30,10 +30,10 @@ public class AuthorService {
         return authorRepository.findByIdIn(ids);
     }
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
-    public Pair<String, Author> save(String name, String surname, String patronymic) {
+    public AbstractMap.SimpleEntry<String, Author> save(String name, String surname, String patronymic) {
         Author authorFromDb = authorRepository.findByNameAndSurname(name, surname);
         if (Objects.nonNull(authorFromDb)) {
-            return new Pair<>("Exists", authorFromDb);
+            return new AbstractMap.SimpleEntry<>("Exists", authorFromDb);
         }
         Author author = new Author();
         author.setName(name);
@@ -41,7 +41,7 @@ public class AuthorService {
         if (StringUtils.isNotEmpty(patronymic)) {
             author.setPatronymic(patronymic);
         }
-        return new Pair<>("New", authorRepository.save(author));
+        return new AbstractMap.SimpleEntry<>("New", authorRepository.save(author));
     }
 
     public Author update(Long id, String name, String surname, String patronymic) {
@@ -60,12 +60,6 @@ public class AuthorService {
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
     public Author delete(Long id) {
-        /*Optional<Author> authorFromDb = authorRepository.findById(id);
-        if (authorFromDb.isEmpty()) {
-            return false;
-        }
-        authorRepository.delete(authorFromDb.get());
-        return true;*/
         Author author = findById(id);
         authorRepository.delete(author);
         return author;

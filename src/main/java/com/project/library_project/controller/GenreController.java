@@ -4,13 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.library_project.entity.Genre;
 import com.project.library_project.service.GenreService;
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.AbstractMap;
 import java.util.logging.Logger;
 
 @Controller
@@ -25,7 +25,7 @@ public class GenreController {
     @PostMapping("/genre")
     public ResponseEntity<String> addGenre(@RequestParam String name) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        Pair<String, Genre> answer = genreService.save(name);
+        AbstractMap.SimpleEntry<String, Genre> answer = genreService.save(name);
         if (answer.getKey().equals("Exists")) {
             log.info("Попытка создать существующий жанр " + "[" + answer.getValue().getId() + ", " + answer.getValue().getName() + "]");
             return new ResponseEntity<>("Жанр уже существует\n" + mapper.writeValueAsString(answer.getValue()), HttpStatus.OK);

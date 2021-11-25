@@ -5,7 +5,6 @@ import com.project.library_project.entity.BookStorage;
 import com.project.library_project.entity.Genre;
 import com.project.library_project.exception.BookNotFoundException;
 import com.project.library_project.repo.BookRepository;
-import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Filter;
 import org.hibernate.ObjectNotFoundException;
@@ -67,10 +66,10 @@ public class BookService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
-    public Pair<String, Book> save(String name, Integer amount, Integer year, String description, Set<Long> authorIds, Set<String> genreNames) {
+    public AbstractMap.SimpleEntry<String, Book> save(String name, Integer amount, Integer year, String description, Set<Long> authorIds, Set<String> genreNames) {
         Book bookFromDb = bookRepository.findByNameAndAuthorsIn(name, authorService.findByIdIn(authorIds));
         if (Objects.nonNull(bookFromDb)) {
-            return new Pair<>("Exists", bookFromDb);
+            return new AbstractMap.SimpleEntry<>("Exists", bookFromDb);
         }
         Book book = new Book();
         book.setName(name);
@@ -92,7 +91,7 @@ public class BookService {
         bookStorage.setAmount(amount);
         bookStorage.setBook(savedBook);
         savedBook.setBookStorage(bookStorage);
-        return new Pair<>("New", bookRepository.save(savedBook));
+        return new AbstractMap.SimpleEntry<>("New", bookRepository.save(savedBook));
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
