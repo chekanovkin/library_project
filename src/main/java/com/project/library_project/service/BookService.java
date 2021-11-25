@@ -5,9 +5,11 @@ import com.project.library_project.entity.BookStorage;
 import com.project.library_project.entity.Genre;
 import com.project.library_project.exception.BookNotFoundException;
 import com.project.library_project.repo.BookRepository;
-import com.project.library_project.repo.BookStorageRepository;
+import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Filter;
 import org.hibernate.ObjectNotFoundException;
+import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
 import java.util.*;
 
 @Service
@@ -33,10 +36,22 @@ public class BookService {
     GenreService genreService;
 
     @Autowired
-    BookStorageRepository bookStorageRepository;
+    private EntityManager entityManager;
 
-    public List<Book> getAllBooks() {
+    public List<Book> getAllBooks(boolean isDeleted) {
+        Session session = entityManager.unwrap(Session.class);
+        Filter filter = session.enableFilter("deletedBookFilter");
+        filter.setParameter("isDeleted", isDeleted);
         return bookRepository.findAll();
+    }
+
+    public Iterable<Book> findAllDeleted(boolean isDeleted) {
+        Session session = entityManager.unwrap(Session.class);
+        Filter filter = session.enableFilter("deletedBookFilter");
+        filter.setParameter("isDeleted", isDeleted);
+        Iterable<Book> products =  bookRepository.findAll();
+        session.disableFilter("deletedBookFilter");
+        return products;
     }
 
     public List<Book> getAllByGenre(String genre) {
@@ -52,10 +67,10 @@ public class BookService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
-    public Book save(String name, Integer amount, Integer year, String description, Set<Long> authorIds, List<String> genreNames) {
+    public Pair<String, Book> save(String name, Integer amount, Integer year, String description, Set<Long> authorIds, Set<String> genreNames) {
         Book bookFromDb = bookRepository.findByNameAndAuthorsIn(name, authorService.findByIdIn(authorIds));
         if (Objects.nonNull(bookFromDb)) {
-            return bookFromDb;
+            return new Pair<>("Exists", bookFromDb);
         }
         Book book = new Book();
         book.setName(name);
@@ -63,29 +78,49 @@ public class BookService {
         if (StringUtils.isNotEmpty(description)) {
             book.setDescription(description);
         }
-        book.setAuthors(authorService.findByIdIn(authorIds));
+        if (Objects.nonNull(authorIds)) {
+            book.setAuthors(authorService.findByIdIn(authorIds));
+        }
         Set<Genre> genres = new HashSet<>();
         for (String str : genreNames) {
             Genre genre = genreService.findByName(str);
             genres.add(genre);
         }
         book.setGenres(genres);
-        bookRepository.save(book);
+        Book savedBook = bookRepository.save(book);
         BookStorage bookStorage = new BookStorage();
-        bookStorage.setBook(book);
         bookStorage.setAmount(amount);
-        bookStorageRepository.save(bookStorage);
-        return bookRepository.findByNameAndAuthorsIn(book.getName(), book.getAuthors());
+        bookStorage.setBook(savedBook);
+        savedBook.setBookStorage(bookStorage);
+        return new Pair<>("New", bookRepository.save(savedBook));
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
-    public Book update(Long id, MultipartFile file, String name, String description) {
+    public Book update(Long id, MultipartFile file, Integer amount, String name, String description, Set<Long> authorIds, Set<String> genreNames) {
         Book bookToUpdate = findById(id);
         if (StringUtils.isNotEmpty(name)) {
             bookToUpdate.setName(name);
         }
         if (StringUtils.isNotEmpty(description)) {
             bookToUpdate.setDescription(description);
+        }
+        if (Objects.nonNull(authorIds)) {
+            bookToUpdate.getAuthors().clear();
+            bookToUpdate.setAuthors(authorService.findByIdIn(authorIds));
+        }
+        if (Objects.nonNull(amount)) {
+            BookStorage bookStorage = bookToUpdate.getBookStorage();
+            bookStorage.setAmount(amount);
+            bookToUpdate.setBookStorage(bookStorage);
+        }
+        if (Objects.nonNull(genreNames)) {
+            bookToUpdate.getGenres().clear();
+            Set<Genre> genres = new HashSet<>();
+            for (String str : genreNames) {
+                Genre genre = genreService.findByName(str);
+                genres.add(genre);
+            }
+            bookToUpdate.setGenres(genres);
         }
         if (Objects.nonNull(file)) {
             storageService.deleteFile(bookToUpdate.getFilename());
@@ -98,7 +133,7 @@ public class BookService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
     public String delete(Long id) {
         Book book = findById(id);
-        storageService.deleteFile(book.getFilename());
+        //storageService.deleteFile(book.getFilename());
         bookRepository.delete(book);
         return book.getName();
     }

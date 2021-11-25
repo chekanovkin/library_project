@@ -1,5 +1,6 @@
 package com.project.library_project.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,8 +17,9 @@ public class BookStorage {
     @NotEmpty
     private int amount;
 
-    @OneToOne()
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @MapsId
     @JoinColumn(name = "book_id")
+    @JsonIgnore
     private Book book;
 }

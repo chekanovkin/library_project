@@ -3,6 +3,7 @@ package com.project.library_project.service;
 import com.project.library_project.entity.Genre;
 import com.project.library_project.exception.GenreNotFoundException;
 import com.project.library_project.repo.GenreRepository;
+import javafx.util.Pair;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,24 +24,32 @@ public class GenreService {
         return genreRepository.findByName(name).orElseThrow(GenreNotFoundException::new);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
-    public Genre save(String name) {
-        Genre genreFromDb = findByName(name);
-        if (Objects.nonNull(genreFromDb)) {
-            return genreFromDb;
-        }
-        Genre genre = new Genre();
-        genre.setName(name);
-        return findByName(genre.getName());
+    public Genre findById(Long id) {
+        return genreRepository.findById(id).orElseThrow(GenreNotFoundException::new);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
-    public boolean delete(Long id) {
-        Optional<Genre> genreFromDb = genreRepository.findById(id);
-        if (genreFromDb.isEmpty()) {
-            return false;
+    public Pair<String, Genre> save(String name) {
+        Optional<Genre> genreFromDb = genreRepository.findByName(name);
+        if (genreFromDb.isPresent()) {
+            return new Pair<>("Exists", genreFromDb.get());
         }
-        genreRepository.delete(genreFromDb.get());
-        return true;
+        Genre genre = new Genre();
+        genre.setName(name);
+        return new Pair<>("New", genreRepository.save(genre));
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
+    public Genre update(Long id, String name) {
+        Genre genre = genreRepository.getById(id);
+        genre.setName(name);
+        return genreRepository.save(genre);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
+    public Genre delete(Long id) {
+        Genre genre = findById(id);
+        genreRepository.delete(genre);
+        return genre;
     }
 }

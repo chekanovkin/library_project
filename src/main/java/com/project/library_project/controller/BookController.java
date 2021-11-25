@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.library_project.entity.Book;
 import com.project.library_project.service.*;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -17,11 +18,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 @Controller
 //@PreAuthorize("isAuthenticated()")
 @RequestMapping("/books-api")
 public class BookController {
+
+    private static Logger log = Logger.getLogger(BookController.class.getName());
 
     @Autowired
     StorageService storageService;
@@ -36,10 +40,16 @@ public class BookController {
                                           @RequestParam() Integer year,
                                           @RequestParam(required = false) String description,
                                           @RequestParam(value = "author") Set<Long> authorId,
-                                          @RequestParam List<String> genres) throws JsonProcessingException {
+                                          @RequestParam Set<String> genres) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        Book book = bookService.save(name, amount, year, description, authorId, genres);
-        return new ResponseEntity<>(mapper.writeValueAsString(book), HttpStatus.OK);
+        Pair<String, Book> answer = bookService.save(name, amount, year, description, authorId, genres);
+        if (answer.getKey().equals("Exists")) {
+            log.info("Попытка создать существующую книгу " + "[" + answer.getValue().getId() + ", " + answer.getValue().getName() + "]");
+            return new ResponseEntity<>("Книга уже существует\n" + mapper.writeValueAsString(answer.getValue()), HttpStatus.OK);
+        } else {
+            log.info("Создана новая книга " + "[" + answer.getValue().getId() + ", " + answer.getValue().getName() + "]");
+            return new ResponseEntity<>("Книга добавлена\n" + mapper.writeValueAsString(answer.getValue()), HttpStatus.OK);
+        }
     }
 
     @GetMapping("/book/{filename}")
@@ -57,13 +67,21 @@ public class BookController {
     @DeleteMapping("/book/{id}")
     public ResponseEntity<String> deleteBook(@PathVariable Long id) {
         String name = bookService.delete(id);
+        log.info("Удалена книга " + "[" + id + ", " + name + "]");
         return new ResponseEntity<>("Книга \"" + name + "\" была удалена", HttpStatus.OK);
+    }
+
+    //@PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/admin/books")
+    public ResponseEntity<String> getDeleted() throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        return new ResponseEntity<>(mapper.writeValueAsString(bookService.findAllDeleted(true)), HttpStatus.OK);
     }
 
     @GetMapping("/books")
     public ResponseEntity<String> getBookList() throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
-        return new ResponseEntity<>(mapper.writeValueAsString(bookService.getAllBooks()), HttpStatus.OK);
+        return new ResponseEntity<>(mapper.writeValueAsString(bookService.getAllBooks(false)), HttpStatus.OK);
     }
 
     @GetMapping("/books/by-genre")
@@ -84,9 +102,14 @@ public class BookController {
     public ResponseEntity<String> updateBook(@PathVariable Long id,
                                              @RequestParam(value = "book", required = false) MultipartFile file,
                                              @RequestParam(required = false) String name,
-                                             @RequestParam(required = false) String description) throws JsonProcessingException {
+                                             @RequestParam(required = false) Integer amount,
+                                             @RequestParam(required = false) String description,
+                                             @RequestParam(required = false) Set<Long> authorIds,
+                                             @RequestParam(required = false) Set<String> genres) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        Book bookToUpdate = bookService.update(id, file, name, description);
+        Book book = bookService.findById(id);
+        Book bookToUpdate = bookService.update(id, file, amount, name, description, authorIds, genres);
+        log.info("Книга обновлена:\nСтарая сущность: " + "[" + book.getId() + ", " + book.getName() + "]\nНовая сущность: " + "[" + bookToUpdate.getId() + ", " + bookToUpdate.getName() + "]");
         return new ResponseEntity<>(mapper.writeValueAsString(bookToUpdate), HttpStatus.OK);
     }
 }

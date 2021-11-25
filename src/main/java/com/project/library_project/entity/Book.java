@@ -2,6 +2,10 @@ package com.project.library_project.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -10,6 +14,9 @@ import java.util.Set;
 
 @Data
 @Entity
+@SQLDelete(sql = "UPDATE book SET deleted = true WHERE id=?")
+@FilterDef(name = "deletedBookFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
+@Filter(name = "deletedBookFilter", condition = "deleted = :isDeleted")
 @EqualsAndHashCode(exclude = "genres")
 public class Book {
 
@@ -26,6 +33,8 @@ public class Book {
     String filename;
 
     String description;
+
+    private boolean deleted = Boolean.FALSE;
 
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
