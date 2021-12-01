@@ -6,25 +6,26 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @Entity
-@EqualsAndHashCode(exclude = "books")
-public class Author {
+@EqualsAndHashCode(exclude = "books", callSuper = false)
+public class Author extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @NotEmpty
+    @NotNull
     String name;
 
-    @NotEmpty
+    @NotNull
     String surname;
 
-    @NotEmpty
+
     String patronymic;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})

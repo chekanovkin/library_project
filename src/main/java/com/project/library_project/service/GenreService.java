@@ -1,9 +1,9 @@
 package com.project.library_project.service;
 
+import com.project.library_project.entity.BaseEntity;
 import com.project.library_project.entity.Genre;
 import com.project.library_project.exception.GenreNotFoundException;
 import com.project.library_project.repo.GenreRepository;
-import javafx.util.Pair;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -29,14 +28,14 @@ public class GenreService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
-    public Pair<String, Genre> save(String name) {
+    public BaseEntity save(String name) {
         Optional<Genre> genreFromDb = genreRepository.findByName(name);
         if (genreFromDb.isPresent()) {
-            return new Pair<>("Exists", genreFromDb.get());
+            return new BaseEntity(true, genreFromDb.get());
         }
         Genre genre = new Genre();
         genre.setName(name);
-        return new Pair<>("New", genreRepository.save(genre));
+        return new BaseEntity(false, genreRepository.save(genre));
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})

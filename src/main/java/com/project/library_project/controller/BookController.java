@@ -2,16 +2,16 @@ package com.project.library_project.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.library_project.entity.BaseEntity;
 import com.project.library_project.entity.Book;
 import com.project.library_project.service.*;
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,13 +42,14 @@ public class BookController {
                                           @RequestParam(value = "author") Set<Long> authorId,
                                           @RequestParam Set<String> genres) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        Pair<String, Book> answer = bookService.save(name, amount, year, description, authorId, genres);
-        if (answer.getKey().equals("Exists")) {
-            log.info("Попытка создать существующую книгу " + "[" + answer.getValue().getId() + ", " + answer.getValue().getName() + "]");
-            return new ResponseEntity<>("Книга уже существует\n" + mapper.writeValueAsString(answer.getValue()), HttpStatus.OK);
+        BaseEntity answer = bookService.save(name, amount, year, description, authorId, genres);
+        Book book = (Book) answer.getEntity();
+        if (answer.isExists()) {
+            log.info("Попытка создать существующую книгу " + "[" + book.getId() + ", " + book.getName() + "]");
+            return new ResponseEntity<>("Книга уже существует", HttpStatus.CONFLICT);
         } else {
-            log.info("Создана новая книга " + "[" + answer.getValue().getId() + ", " + answer.getValue().getName() + "]");
-            return new ResponseEntity<>("Книга добавлена\n" + mapper.writeValueAsString(answer.getValue()), HttpStatus.OK);
+            log.info("Создана новая книга " + "[" + book.getId() + ", " + book.getName() + "]");
+            return new ResponseEntity<>("Книга добавлена\n" + mapper.writeValueAsString(book), HttpStatus.OK);
         }
     }
 

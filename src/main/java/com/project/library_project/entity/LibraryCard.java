@@ -1,13 +1,15 @@
 package com.project.library_project.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
 @Entity
-public class LibraryCard {
+public class LibraryCard extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

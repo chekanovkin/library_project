@@ -9,6 +9,7 @@ import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,17 +18,17 @@ import java.util.Set;
 @SQLDelete(sql = "UPDATE book SET deleted = true WHERE id=?")
 @FilterDef(name = "deletedBookFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
 @Filter(name = "deletedBookFilter", condition = "deleted = :isDeleted")
-@EqualsAndHashCode(exclude = "genres")
-public class Book {
+@EqualsAndHashCode(exclude = "genres", callSuper = false)
+public class Book extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @NotEmpty
+    @NotNull
     String name;
 
-    @NotEmpty
+    @NotNull
     int year;
 
     String filename;
