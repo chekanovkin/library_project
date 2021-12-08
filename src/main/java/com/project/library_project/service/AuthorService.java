@@ -30,18 +30,20 @@ public class AuthorService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
-    public BaseEntity save(String name, String surname, String patronymic) {
+    public Author save(String name, String surname, String patronymic) {
         Author authorFromDb = authorRepository.findByNameAndSurname(name, surname);
         if (Objects.nonNull(authorFromDb)) {
-            return new BaseEntity(true, authorFromDb);
+            authorFromDb.setExists(true);
+            return authorFromDb;
         }
         Author author = new Author();
         author.setName(name);
         author.setSurname(surname);
+        author.setExists(false);
         if (StringUtils.isNotEmpty(patronymic)) {
             author.setPatronymic(patronymic);
         }
-        return new BaseEntity(false, authorRepository.save(author));
+        return authorRepository.save(author);
     }
 
     public Author update(Long id, String name, String surname, String patronymic) {

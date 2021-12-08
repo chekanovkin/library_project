@@ -9,6 +9,7 @@ import com.project.library_project.repo.LibraryCardRepository;
 import com.project.library_project.service.BookService;
 import com.project.library_project.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,7 +31,7 @@ public class Scheduler {
     @Autowired
     LibraryCardRepository libraryCardRepository;
 
-    @Scheduled(fixedDelay = 60*60*1000)
+    @Scheduled(fixedDelayString = "${sheduler.delay}")
     public void scheduleLibraryCards() {
         List<LibraryCard> cards = libraryCardRepository.findAll()
             .stream()

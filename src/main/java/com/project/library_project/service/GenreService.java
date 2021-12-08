@@ -28,14 +28,17 @@ public class GenreService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
-    public BaseEntity save(String name) {
+    public Genre save(String name) {
         Optional<Genre> genreFromDb = genreRepository.findByName(name);
         if (genreFromDb.isPresent()) {
-            return new BaseEntity(true, genreFromDb.get());
+            Genre genre = genreFromDb.get();
+            genre.setExists(true);
+            return genre;
         }
         Genre genre = new Genre();
         genre.setName(name);
-        return new BaseEntity(false, genreRepository.save(genre));
+        genre.setExists(false);
+        return genreRepository.save(genre);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})

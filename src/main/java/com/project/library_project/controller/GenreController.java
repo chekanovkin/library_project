@@ -2,7 +2,6 @@ package com.project.library_project.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.library_project.entity.BaseEntity;
 import com.project.library_project.entity.Genre;
 import com.project.library_project.service.GenreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +24,8 @@ public class GenreController {
     @PostMapping("/genre")
     public ResponseEntity<String> addGenre(@RequestParam String name) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        BaseEntity answer = genreService.save(name);
-        Genre genre = (Genre) answer.getEntity();
-        if (answer.isExists()) {
+        Genre genre = genreService.save(name);
+        if (genre.isExists()) {
             log.info("Попытка создать существующий жанр " + "[" + genre.getId() + ", " + genre.getName() + "]");
             return new ResponseEntity<>("Жанр уже существует", HttpStatus.CONFLICT);
         } else {

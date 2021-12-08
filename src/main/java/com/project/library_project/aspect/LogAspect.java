@@ -25,10 +25,9 @@ public class LogAspect {
     @Pointcut("execution(public * com.project.library_project.service.AuthorService.save(..)) && args(name, surname, patronymic)")
     public void callAtAuthorServiceSave(String name, String surname, String patronymic) { }
 
-    @AfterReturning(pointcut = "callAtAuthorServiceSave(String, String, String)", returning = "answer")
-    public void afterCallSave(BaseEntity answer) {
-        Author author = (Author) answer.getEntity();
-        if (answer.isExists()) {
+    @AfterReturning(pointcut = "callAtAuthorServiceSave(String, String, String)", returning = "author")
+    public void afterCallSave(Author author) {
+        if (author.isExists()) {
             logger.info("Попытка создать существующего автора " + "[" +  author.getId() + ", " + author.getSurname() + " " + author.getName() + " " + author.getPatronymic() + "]");
         } else {
             logger.info("Создан новый автор " + "[" + author.getId() + ", " + author.getSurname() + " " + author.getName() + " " + author.getPatronymic() + "]");

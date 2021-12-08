@@ -67,10 +67,11 @@ public class BookService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})
-    public BaseEntity save(String name, Integer amount, Integer year, String description, Set<Long> authorIds, Set<String> genreNames) {
+    public Book save(String name, Integer amount, Integer year, String description, Set<Long> authorIds, Set<String> genreNames) {
         Book bookFromDb = bookRepository.findByNameAndAuthorsIn(name, authorService.findByIdIn(authorIds));
         if (Objects.nonNull(bookFromDb)) {
-            return new BaseEntity(true, bookFromDb);
+            bookFromDb.setExists(true);
+            return bookFromDb;
         }
         Book book = new Book();
         book.setName(name);
@@ -87,12 +88,13 @@ public class BookService {
             genres.add(genre);
         }
         book.setGenres(genres);
+        book.setExists(false);
         Book savedBook = bookRepository.save(book);
         BookStorage bookStorage = new BookStorage();
         bookStorage.setAmount(amount);
         bookStorage.setBook(savedBook);
         savedBook.setBookStorage(bookStorage);
-        return new BaseEntity(false, bookRepository.save(savedBook));
+        return bookRepository.save(savedBook);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {ObjectNotFoundException.class, ConstraintViolationException.class})

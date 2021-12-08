@@ -13,7 +13,7 @@ import java.util.Set;
 @Data
 @Entity
 @EqualsAndHashCode(exclude = "books", callSuper = false)
-public class Author extends BaseEntity{
+public class Author extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

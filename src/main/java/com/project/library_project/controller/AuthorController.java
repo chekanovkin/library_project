@@ -3,7 +3,6 @@ package com.project.library_project.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.library_project.entity.Author;
-import com.project.library_project.entity.BaseEntity;
 import com.project.library_project.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,11 +22,10 @@ public class AuthorController {
                                             @RequestParam String surname,
                                             @RequestParam(required = false) String patronymic) throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
-        BaseEntity answer = authorService.save(name, surname, patronymic);
-        if (answer.isExists()) {
+        Author author = authorService.save(name, surname, patronymic);
+        if (author.isExists()) {
             return new ResponseEntity<>("Автор уже существует", HttpStatus.CONFLICT);
         } else {
-            Author author = (Author) answer.getEntity();
             return new ResponseEntity<>("Создан новый автор\n" + mapper.writeValueAsString(author), HttpStatus.OK);
         }
     }

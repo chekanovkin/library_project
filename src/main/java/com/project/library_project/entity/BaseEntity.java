@@ -1,18 +1,17 @@
 package com.project.library_project.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
+
+@MappedSuperclass
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class BaseEntity {
 
-    @JsonIgnore
-    private boolean exists;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    @JsonIgnore
-    private BaseEntity entity;
+    @Transient
+    private boolean exists;
 }

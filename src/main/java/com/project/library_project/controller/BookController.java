@@ -2,7 +2,8 @@ package com.project.library_project.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.library_project.entity.BaseEntity;
+import com.project.library_project.converter.BookDtoConverter;
+import com.project.library_project.dto.BookDto;
 import com.project.library_project.entity.Book;
 import com.project.library_project.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +43,8 @@ public class BookController {
                                           @RequestParam(value = "author") Set<Long> authorId,
                                           @RequestParam Set<String> genres) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        BaseEntity answer = bookService.save(name, amount, year, description, authorId, genres);
-        Book book = (Book) answer.getEntity();
-        if (answer.isExists()) {
+        Book book = bookService.save(name, amount, year, description, authorId, genres);
+        if (book.isExists()) {
             log.info("Попытка создать существующую книгу " + "[" + book.getId() + ", " + book.getName() + "]");
             return new ResponseEntity<>("Книга уже существует", HttpStatus.CONFLICT);
         } else {
@@ -109,8 +109,9 @@ public class BookController {
                                              @RequestParam(required = false) Set<String> genres) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Book book = bookService.findById(id);
+        BookDto bookDto = BookDtoConverter.convert(book);
         Book bookToUpdate = bookService.update(id, file, amount, name, description, authorIds, genres);
-        log.info("Книга обновлена:\nСтарая сущность: " + "[" + book.getId() + ", " + book.getName() + "]\nНовая сущность: " + "[" + bookToUpdate.getId() + ", " + bookToUpdate.getName() + "]");
+        log.info("Книга обновлена:\nСтарая сущность: " + "[" + bookDto.getId() + ", " + bookDto.getName() + "]\nНовая сущность: " + "[" + book.getId() + ", " + book.getName() + "]");
         return new ResponseEntity<>(mapper.writeValueAsString(bookToUpdate), HttpStatus.OK);
     }
 }
