@@ -16,7 +16,9 @@ public class RabbitConfig {
 
     @Bean
     public ConnectionFactory connectionFactory() {
-        return new CachingConnectionFactory("localhost:8080");
+        CachingConnectionFactory factory = new CachingConnectionFactory();
+        factory.setHost("::1");
+        return factory;
     }
 
     @Bean

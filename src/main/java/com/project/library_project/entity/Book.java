@@ -17,7 +17,7 @@ import java.util.Set;
 @SQLDelete(sql = "UPDATE book SET deleted = true WHERE id=?")
 @FilterDef(name = "deletedBookFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
 @Filter(name = "deletedBookFilter", condition = "deleted = :isDeleted")
-@EqualsAndHashCode(exclude = "genres", callSuper = false)
+@EqualsAndHashCode(exclude = {"genres", "bookStorage"}, callSuper = false)
 public class Book extends BaseEntity{
 
     @Id
