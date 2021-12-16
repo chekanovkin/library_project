@@ -12,6 +12,8 @@ import java.util.Set;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
 
+    Book findByName(String name);
+
     Book findByNameAndAuthorsIn(String name, Set<Author> authors);
 
     List<Book> findByYear(int year);

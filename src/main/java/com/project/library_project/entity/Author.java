@@ -1,11 +1,11 @@
 package com.project.library_project.entity;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +13,7 @@ import java.util.Set;
 @Data
 @Entity
 @EqualsAndHashCode(exclude = "books", callSuper = false)
+@JsonFilter("myFilter")
 public class Author extends BaseEntity {
 
     @Id

@@ -1,5 +1,6 @@
 package com.project.library_project.entity;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Data
 @Entity
+@JsonFilter("myFilter")
 public class BookStorage {
 
     @Id

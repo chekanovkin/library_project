@@ -20,8 +20,9 @@ public class RabbitMqListener {
     public String getBookFromQueue(String bookInJson) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Book book = mapper.readValue(bookInJson, Book.class);
-        Book bookInDb = bookRepository.findByNameAndAuthorsIn(book.getName(), book.getAuthors());
-        if (Objects.nonNull(bookInDb)) {
+        Book bookInDb = bookRepository.findByName(book.getName());
+        if (Objects.isNull(bookInDb)) {
+            book.getBookStorage().setBook(book);
             bookRepository.save(book);
             return "Получена новая книга : " + book;
         }

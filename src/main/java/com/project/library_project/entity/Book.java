@@ -1,7 +1,9 @@
 package com.project.library_project.entity;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
@@ -18,6 +20,8 @@ import java.util.Set;
 @FilterDef(name = "deletedBookFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
 @Filter(name = "deletedBookFilter", condition = "deleted = :isDeleted")
 @EqualsAndHashCode(exclude = {"genres", "bookStorage"}, callSuper = false)
+@ToString(exclude = "bookStorage")
+@JsonFilter("myFilter")
 public class Book extends BaseEntity{
 
     @Id

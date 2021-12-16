@@ -1,5 +1,6 @@
 package com.project.library_project.entity;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Entity
+@JsonFilter("myFilter")
 public class LibraryCard extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.EAGER)

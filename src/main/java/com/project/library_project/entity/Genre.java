@@ -1,5 +1,6 @@
 package com.project.library_project.entity;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,6 +13,7 @@ import java.util.Set;
 @Data
 @Entity
 @EqualsAndHashCode(exclude = "books", callSuper = false)
+@JsonFilter("myFilter")
 public class Genre extends BaseEntity{
 
     @Id
